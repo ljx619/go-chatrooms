@@ -59,18 +59,21 @@ func (this *Server) Handle(conn net.Conn) {
 
 	//接收客户端传递过来的消息
 	go func() {
-		buf := make([]byte, 1024)
+		buf := make([]byte, 4096)
 		for {
 			n, err := conn.Read(buf)
 			if n == 0 {
 				user.Offline()
+				return
 			}
 			if err != nil && err != io.EOF {
 				fmt.Println("Conn Read err:", err)
 				return
 			}
 			//提取用户的消息(去除\n回车符)
-			msg := string(buf[:n])
+			msg := string(buf[:n-1])
+
+			//用户针对msg进行处理
 			user.DoMessage(msg)
 		}
 	}()

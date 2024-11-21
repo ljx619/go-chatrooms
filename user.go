@@ -29,6 +29,7 @@ func NewUser(conn net.Conn, server *Server) *User {
 	return user
 }
 
+// Online 用户上线业务
 func (this *User) Online() {
 	this.server.mapLock.Lock()
 	this.server.OnlineMap[this.Name] = this
@@ -37,6 +38,7 @@ func (this *User) Online() {
 	this.server.BroadCast(this, "已上线")
 }
 
+// Offline 用户下线业务
 func (this *User) Offline() {
 	this.server.mapLock.Lock()
 	delete(this.server.OnlineMap, this.Name)
@@ -45,6 +47,7 @@ func (this *User) Offline() {
 	this.server.BroadCast(this, "已下线")
 }
 
+// DoMessage 用户处理详细业务
 func (this *User) DoMessage(msg string) {
 	this.server.BroadCast(this, msg)
 }
