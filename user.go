@@ -47,9 +47,23 @@ func (this *User) Offline() {
 	this.server.BroadCast(this, "已下线")
 }
 
+func (this *User) SendMsg(msg string) {
+	this.conn.Write([]byte(msg))
+}
+
 // DoMessage 用户处理详细业务
 func (this *User) DoMessage(msg string) {
-	this.server.BroadCast(this, msg)
+	if msg == "who" {
+		//查询当前的在线用户
+		this.server.mapLock.Lock()
+		for _, user := range this.server.OnlineMap {
+			onlineMsg := "[" + user.Addr + "]" + user.Name + ":" + "在线...\n"
+			this.SendMsg(onlineMsg)
+		}
+		this.server.mapLock.Unlock()
+	} else {
+		this.server.BroadCast(this, msg)
+	}
 }
 
 // ListenMessage 监听当前 user channel 的方法，一旦有消息，直接发送到对端客户端
