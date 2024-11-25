@@ -90,7 +90,7 @@ func (this *Server) Handle(conn net.Conn) {
 		case <-isLive:
 			//不做任何事情 为了重置下面的 计时器
 			//这里有一个技巧 case 没用 break 所以执行到这里之后也会执行下面的
-		case <-time.After(time.Second * 30):
+		case <-time.After(time.Second * 300):
 			//30s后超时
 			//将 当前 user 踢出去
 			user.SendMsg("已超时,被踢出")
