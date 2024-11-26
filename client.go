@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"net"
+	"os"
 	"strconv"
 )
 
@@ -33,6 +35,19 @@ func NewClient(serverIp string, serverPort int) *Client {
 
 	//返回对象
 	return client
+}
+
+func (client *Client) UpdateName() bool {
+	fmt.Println(">>>请输入用户名")
+	fmt.Scanln(&client.Name)
+
+	sendMsg := "rename|" + client.Name + "\n"
+	_, err := client.conn.Write([]byte(sendMsg))
+	if err != nil {
+		fmt.Println("client.conn.Write err:", err)
+		return false
+	}
+	return true
 }
 
 func (client *Client) menu() bool {
@@ -65,9 +80,16 @@ func (client *Client) run() {
 			break
 		case 3:
 			//更新用户名
+			client.UpdateName()
 			break
 		}
 	}
+}
+
+// DealResponse 处理server回传过来的消息 这里显示到标准输入输出
+func (client *Client) DealResponse() {
+	//一旦client.conn有数据就直接拷贝到 stdout 输出中 永久阻塞监听
+	io.Copy(os.Stdout, client.conn)
 }
 
 var serverIp string
@@ -89,6 +111,9 @@ func main() {
 		fmt.Println(">>>链接服务器失败...")
 		return
 	}
+
+	//单独开启一个goroutine处理server回传的消息
+	go client.DealResponse()
 
 	fmt.Println(">>>链接服务器成功...")
 
