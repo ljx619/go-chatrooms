@@ -37,6 +37,30 @@ func NewClient(serverIp string, serverPort int) *Client {
 	return client
 }
 
+func (client *Client) PublicChat() {
+	var chatMsg string
+
+	//提醒用户输入内容
+	fmt.Println(">>>请输入聊天内容,exit退出")
+	fmt.Scanln(&chatMsg)
+	for chatMsg != "exit" {
+		//发给服务器
+		//消息不为空咋发送
+		if len(chatMsg) != 0 {
+			sendMsg := chatMsg + "\n"
+			_, err := client.conn.Write([]byte(sendMsg))
+			if err != nil {
+				fmt.Println("client.conn.Write err:", err)
+			}
+		}
+
+		//循环处理
+		chatMsg = ""
+		fmt.Println(">>>请输入聊天内容,exit退出")
+		fmt.Scanln(&chatMsg)
+	}
+}
+
 func (client *Client) UpdateName() bool {
 	fmt.Println(">>>请输入用户名")
 	fmt.Scanln(&client.Name)
@@ -77,6 +101,7 @@ func (client *Client) run() {
 			break
 		case 2:
 			//私聊模式
+			client.PublicChat()
 			break
 		case 3:
 			//更新用户名
