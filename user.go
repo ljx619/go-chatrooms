@@ -92,7 +92,7 @@ func (this *User) DoMessage(msg string) {
 
 		// 2.根据用户名得到对方的user对象
 		remoteUser, ok := this.server.OnlineMap[remoteName]
-		if ok {
+		if !ok {
 			this.SendMsg("该用户名不存在")
 		}
 		// 3.获取消息内容通过对方的user对象将内容发送过去
